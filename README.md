@@ -24,7 +24,17 @@ public class ConnManager {<br>
         m.remove(s);
     }
 }<br>
-### 2.AMQP(Advanced Message Queuing Protocol)高级消息队列协议
+这样做的问题是User生命周期与Connection挂钩，我们无法准确预知Connection在什么时候结束，所以需要在每个Connection关闭之后，手动从Map中移除键值对，否则Connection和User将一直被Map引用，即使Connection的生命周期已经结束了，GC也无法回收对应的Connection和User。这些对象留在内存中不受控制，可能会造成内存溢出。<br>
+**解决方法**：private Map<Connection,User> m = new WeakHashMap<Connection,User>();<br>
+WeakHashMap 与 HashMap类似，但是在其内部，key是经过WeakReference包装的。使用WeakHashMap情况会变得怎样呢？
+每当垃圾回收发生时，那些已经结束生命周期的Connection对象(没有强引用指向它)不受WeakHashMap中key(WeakReference)的影响，可以直接回收掉。同时，WeakHashMap利用ReferenceQueue(下文会提到) 可以做到删除那些已经被回收的Connection对应的User。
+### 2.可达性分析算法
+Java执行GC时，需要判断对象是否存活。判断一个对象是否存活使用了"可达性分析算法"。
+基本思路就是通过一系列称为GC Roots的对象作为起点，从这些节点开始向下搜索，搜索所走过的路径称为引用链，当一个对象到GC Roots没有任何引用链相连，即从GC Roots到这个对象不可达时，证明此对象不可用。<br>
+**可作为GC ROOTS的对象包括：**<br>
+**1.虚拟机栈中引用的对象 2.方法区中类静态属性引用的对象 3.方法区中常量引用的对象 4.本地方法栈JNI引用的对象**<br>
+往往到达一个对象的引用链会存在多条，垃圾回收时会依据两个原则来判断对象的可达性：
+### 3.AMQP(Advanced Message Queuing Protocol)高级消息队列协议
 消息生产者Producer(Message) **->** 消息队列服务器实体Broker(消息交换机Exchange,绑定Bindings,消息队列载体Queues) **->** 消息消费者Consumer(Message)<br>
 **Exchange**：消息交换机，它指定消息按照什么规则，路由到哪个队列。<br>
 **Bindings**：绑定，它的作用是将Exchange和Queues按照路由规则绑定起来。<br>
