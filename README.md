@@ -7,7 +7,10 @@
 3.本地方法栈：本地方法栈与虚拟机栈的作用类似，区别就是虚拟机栈为虚拟机执行Java方法服务，而本地方法栈为虚拟机执行Native方法服务。
 4.Java堆：**被所有线程共享的一块区域**，在虚拟机启动时创建。此内存区域的唯一目的就是**存放对象实例，几乎所有的对象实例都在这里分配内存**。Java堆是垃圾收集器管理的主要区域，由于现在收集器都采用分代收集算法，所以Java堆可以细分为**新生代和老年代**，再细致一点可以分为**Eden空间，From Survivor空间和 To Survivor空间**。
 5.方法区：也是**被所有线程共享的一块区域**，用于存放加载的类信息、常量、静态变量、即时编译后的代码等。
-6.运行时常量池：
+6.运行时常量池：是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池(Constant Pool Table)，用于存放编译期生成的字面量和符号引用。运行时常量池相对于Class文件常量池的另外一个重要特征是**动态性**，Java语言并不要求常量只有在编译期才能产生，运行期间也可以将新的常量放入常量池中，**例如String.inter()方法**。
+### 垃圾收集器与内存分配策略
+1.**引用计数算法**(Reference Counting)：给对象中添加一个引用计数器，每当有一个地方引用他时，计数器值就加1；当引用失效时，计数器值就减1；任何时刻计数器值为0的对象就是不可再被使用的。**优势：实现简单、判定效率高** **劣势:很难解决对象之间互相循环引用的问题**
+2.**可达性分析算法(Reachability Analysis)** ：从"GC ROOTS"对象开始向下搜索，搜索所走过的路径称为引用链(Reference Chain)，当一个对象到GC ROOTS没有任何引用链连接时，则证明此对象不可用。**可被称为GC ROOTS的对象：1.虚拟机栈(栈帧中本地变量表)引用的对象 2.方法区中类静态属性引用的对象 3.方法区中常量引用的对象 4.本地方法栈JNI中引用的对象**
 ## 二、学习笔记
 ### 1.Java引用类型：
 1.强引用：类似于 Object a = new Object() 这类的引用，**只要垃圾强引用存在，垃圾回收器就不会回收被引用的对象**。<br>
@@ -31,7 +34,8 @@ public class ConnManager {<br>
 这样做的问题是User生命周期与Connection挂钩，我们无法准确预知Connection在什么时候结束，所以需要在每个Connection关闭之后，手动从Map中移除键值对，否则Connection和User将一直被Map引用，即使Connection的生命周期已经结束了，GC也无法回收对应的Connection和User。这些对象留在内存中不受控制，可能会造成内存溢出。<br>
 **解决方法**：private Map<Connection,User> m = new WeakHashMap<Connection,User>();<br>
 WeakHashMap 与 HashMap类似，但是在其内部，key是经过WeakReference包装的。使用WeakHashMap情况会变得怎样呢？
-每当垃圾回收发生时，那些已经结束生命周期的Connection对象(没有强引用指向它)不受WeakHashMap中key(WeakReference)的影响，可以直接回收掉。同时，WeakHashMap利用ReferenceQueue(下文会提到) 可以做到删除那些已经被回收的Connection对应的User。
+每当垃圾回收发生时，那些已经结束生命周期的Connection对象(没有强引用指向它)不受WeakHashMap中key(WeakReference)的影响，可以直接回收掉。同时，WeakHashMap利用ReferenceQueue(下文会提到) 可以做到删除那些已经被回收的Connection对应的User。<br>
+
 ### 2.可达性分析算法
 Java执行GC时，需要判断对象是否存活。判断一个对象是否存活使用了"可达性分析算法"。
 基本思路就是通过一系列称为GC Roots的对象作为起点，从这些节点开始向下搜索，搜索所走过的路径称为引用链，当一个对象到GC Roots没有任何引用链相连，即从GC Roots到这个对象不可达时，证明此对象不可用。<br>
@@ -40,6 +44,7 @@ Java执行GC时，需要判断对象是否存活。判断一个对象是否存�
 往往到达一个对象的引用链会存在多条，垃圾回收时会依据两个原则来判断对象的可达性：<br>
 **1.单一路径中，以最弱的引用为准。**<br>
 **2.多路径中，以最强的引用为准。**<br>
+
 ### 3.AMQP(Advanced Message Queuing Protocol)高级消息队列协议
 消息生产者Producer(Message) **->** 消息队列服务器实体Broker(消息交换机Exchange,绑定Bindings,消息队列载体Queues) **->** 消息消费者Consumer(Message)<br>
 **Exchange**：消息交换机，它指定消息按照什么规则，路由到哪个队列。<br>
@@ -55,7 +60,7 @@ Binding 表示 Exchange 与 Queue 之间的关系，我们也可以简单的认�
 **Direct Exchange**:Direct Exchange 是 RabbitMQ 默认的 Exchange，完全根据 RoutingKey 来路由消息。设置 Exchange 和 Queue 的 Binding 时需指定 RoutingKey（一般为 Queue Name），发消息时也指定一样的 RoutingKey，消息就会被路由到对应的Queue。<br>
 应用场景：现在我们考虑只把重要的日志消息写入磁盘文件，例如只把 Error 级别的日志发送给负责记录写入磁盘文件的 Queue。这种场景下我们可以使用指定的 RoutingKey（例如 error）将写入磁盘文件的 Queue 绑定到 Direct Exchange 上。<br>
 **Topic Exchange**：Topic Exchange 和 Direct Exchange 类似，也需要通过 RoutingKey 来路由消息，区别在于Direct Exchange 对 RoutingKey 是精确匹配，而 Topic Exchange 支持模糊匹配。分别支持 * 和 # 通配符，* 表示匹配一个单词，#则表示匹配没有或者多个单词。<br>
-应用场景：假设我们的消息路由规则除了需要根据日志级别来分发之外还需要根据消息来源分发，可以将 RoutingKey 定义为 消息来源.级别 如 order.info、user.error等。处理所有来源为 user 的 Queue 就可以通过 user.* 绑定到 Topic Exchange 上，而处理所有日志级别为 info 的 Queue 可以通过 * .info 绑定到 Exchange上。
+应用场景：假设我们的消息路由规则除了需要根据日志级别来分发之外还需要根据消息来源分发，可以将 RoutingKey 定义为 消息来源.级别 如 order.info、user.error等。处理所有来源为 user 的 Queue 就可以通过 user.* 绑定到 Topic Exchange 上，而处理所有日志级别为 info 的 Queue 可以通过 * .info 绑定到 Exchange上。<br>
 
 ### 4.String.intern()
-String.intern()是一个Native方法，底层调用C++的 StringTable::intern方法实现。**当通过语句str.intern()调用intern()方法后，JVM 就会在当前类的常量池中查找是否存在与str等值的String，若存在则直接返回常量池中相应Strnig的引用；若不存在，则会在常量池中创建一个等值的String，然后返回这个String在常量池中的引用。**因此，只要是等值的String对象，使用intern()方法返回的都是常量池中同一个String引用，所以，这些等值的String对象通过intern()后使用==是可以匹配的。
+String.intern()是一个Native方法，底层调用C++的 StringTable::intern方法实现。**当通过语句str.intern()调用intern()方法后，JVM 就会在当前类的常量池中查找是否存在与str等值的String，若存在则直接返回常量池中相应Strnig的引用；若不存在，则会在常量池中创建一个等值的String，然后返回这个String在常量池中的引用。** 因此，只要是等值的String对象，使用intern()方法返回的都是常量池中同一个String引用，所以，这些等值的String对象通过intern()后使用==是可以匹配的。**intern()方法优点：执行速度非常快，直接使用==进行比较要比使用equals()方法快很多；内存占用少。** 虽然intern()方法的优点看上去很诱人，但若不是在恰当的场合中使用该方法的话，便非但不能获得如此好处，反而还可能会有性能损失。由于intern()操作每次都需要与常量池中的数据进行比较以查看常量池中是否存在等值数据，同时JVM需要确保常量池中的数据的唯一性，这就涉及到加锁机制，这些操作都是有需要占用CPU时间的，所以如果进行intern操作的是大量不会被重复利用的String的话，则有点得不偿失。由此可见，String.intern()主要 适用于只有有限值，并且这些有限值会被重复利用的场景，如数据库表中的列名、人的姓氏、编码类型等。https://blog.csdn.net/u011635492/article/details/81048150
