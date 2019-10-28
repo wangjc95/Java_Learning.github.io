@@ -31,7 +31,14 @@
 2.服务治理。服务治理规则的存储与通知。<br>
 <dubbo:config-center address="zookeeper://127.0.0.1:2181"/> <br>
 **为了兼容2.6.x版本配置，在使用Zookeeper作为注册中心，且没有显示配置配置中心的情况下，Dubbo框架会默认将此Zookeeper用作配置中心，但将只作服务治理用途。** <br>
-**外部化配置**：外部化配置默认较本地配置有更高的优先级，因此这里配置的内容会覆盖本地配置值，也可通过以下选项调整配置中心的优先级：-Ddubbo.config-center.highest-priority=false
+**外部化配置**：外部化配置默认较本地配置有更高的优先级，因此这里配置的内容会覆盖本地配置值，也可通过以下选项调整配置中心的优先级：-Ddubbo.config-center.highest-priority=false <br>
+外部化配置有全局和应用两个级别，全局配置是所有应用共享的，应用级配置是由每个应用自己维护且只对自身可见的。**节点结构**：(namespace，用于不同配置的环境隔离)dubbo->config(Dubbo约定的固定节点，不可更改，所有配置和服务治理规则都存储在此节点下)->dubbo/application(分别用来隔离全局配置、应用级别配置：dubbo是默认group值，application对应应用名)->dubbo.properties(此节点的node value存储具体配置内容)。<br>
+**配置加载流程**：Dubbo支持了多层级的配置，并按预定优先级自动实现配置间的覆盖，最终所有配置汇总到数据总线URL后驱动后续的服务暴露、引用等流程。<br>
+Dubbo支持的配置来源说起，默认有四种配置来源（优先级从高到低）：<br>
+JVM System Properties，-D参数<br>
+Externalized Configuration，外部化配置<br>
+ServiceConfig、ReferenceConfig等编程接口采集的配置<br>
+本地配置文件dubbo.properties<br>
 
 
 ## 三、学习笔记
