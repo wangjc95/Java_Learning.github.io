@@ -260,3 +260,28 @@ InnoDB  中  MVCC  的实现方式为：每一行记录都有两个隐藏列： 
 4.记录  redo log ，包括  undo log  中的修改
 
 那么  INSERT  和  DELETE  会怎么做呢？其实相比  UPDATE  这二者很简单， INSERT  会产生一条新纪录，它的  DATA_TRX_ID  为当前插入记录的事务  ID ； DELETE  某条记录时可看成是一种特殊的  UPDATE ，其实是软删，真正执行删除操作会在  commit  时， DATA_TRX_ID  则记录下删除该记录的事务  ID 。
+**如何实现一致性读？**<br>
+在  RU  隔离级别下，直接读取版本的最新记录就 OK，对于  SERIALIZABLE  隔离级别，则是通过加锁互斥来访问数据，因此不需要  MVCC  的帮助。因此  MVCC  运行在  RC  和  RR 这两个隔离级别下，当  InnoDB  隔离级别设置为二者其一时，在  SELECT  数据时就会用到版本链
+
+核心问题是版本链中哪些版本对当前事务可见？
+
+InnoDB  为了解决这个问题，设计了  **ReadView （可读视图）**的概念。
+
+**RR下ReadView的生成**<br>
+在  RR  隔离级别下，每个事务  touch first read  时（本质上就是执行第一个  SELECT 语句时，后续所有的  SELECT  都是复用这个  ReadView ，其它  update ,  delete ,  insert  语句和一致性读  snapshot  的建立没有关系），会将当前系统中的所有的活跃事务拷贝到一个列表生成  ReadView 。
+
+下图中事务  A  第一条  SELECT  语句在事务  B  更新数据前，因此生成的  ReadView  在事务  A  过程中不发生变化，即使事务  B  在事务  A  之前提交，但是事务  A  第二条查询语句依旧无法读到事务  B  的修改。
+![Aaron Swartz](https://raw.githubusercontent.com/wangjc95/photos/master/9ddb47dae87151dac6c8829bd98e30cd.png) <br>
+
+**RC下ReadView的生成**<br>
+在  RC  隔离级别下，每个  SELECT  语句开始时，都会重新将当前系统中的所有的活跃事务拷贝到一个列表生成  ReadView 。**二者的区别就在于生成  ReadView  的时间点不同，一个是事务之后第一个  SELECT  语句开始、一个是事务中每条  SELECT  语句开始。**<br>
+
+ReadView  中是当前活跃的事务  ID  列表，称之为  m_ids ，其中最小值为  up_limit_id ，最大值为  low_limit_id ，事务  ID  是事务开启时  InnoDB  分配的，其大小决定了事务开启的先后顺序，因此我们可以通过  ID  的大小关系来决定版本记录的可见性，具体判断流程如下：
+1.如果被访问版本的  trx_id  小于  m_ids  中的最小值  up_limit_id ，说明生成该版本的事务在  ReadView  生成前就已经提交了，所以该版本可以被当前事务访问。<br>
+
+2.如果被访问版本的  trx_id  大于  m_ids  列表中的最大值  low_limit_id ，说明生成该版本的事务在生成  ReadView  后才生成，所以该版本不可以被当前事务访问。需要根据  Undo Log  链找到前一个版本，然后根据该版本的 DB_TRX_ID 重新判断可见性。<br>
+
+3.如果被访问版本的  trx_id  属性值在  m_ids  列表中最大值和最小值之间（包含），那就需要判断一下  trx_id  的值是不是在  m_ids  列表中。如果在，说明创建  ReadView  时生成该版本所属事务还是活跃的，因此该版本不可以被访问，需要查找 Undo Log 链得到上一个版本，然后根据该版本的  DB_TRX_ID  再从头计算一次可见性；如果不在，说明创建  ReadView  时生成该版本的事务已经被提交，该版本可以被访问。<br>
+
+4.此时经过一系列判断我们已经得到了这条记录相对  ReadView  来说的可见结果。此时，如果这条记录的  delete_flag  为  true ，说明这条记录已被删除，不返回。否则说明此记录可以安全返回给客户端。<br>
+
