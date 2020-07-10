@@ -318,3 +318,15 @@ ReadView  中是当前活跃的事务  ID  列表，称之为  m_ids ，其中�
 5、Redis使用场景
 6、MyBatis DAO接口可以重载吗？二级缓存机制
 7、NIO多路复用IO
+
+### 货拉拉
+一面：1、自我介绍
+2、JVM内存模型，GC原理
+3、线程池参数及工作原理
+3、加锁有哪几种方式？synchronized和Lock区别、性能
+4、SpringBoot相关，了解不多
+5、Dubbo架构、协议
+6、Redis使用场景？redis和zk分布式锁的区别？
+7、接口的设计原则
+8、sql调优的经验
+9、项目难点
