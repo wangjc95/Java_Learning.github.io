@@ -343,7 +343,7 @@ ReadView  中是当前活跃的事务  ID  列表，称之为  m_ids ，其中�
 一面：1、DDD的理解
 2、SpringBoot 自动配置原理
 3、怎么保证Dubbo高可用
-4、synchronized和Lock区别，Lock底层实现
+4、synchronized和Lock区别，Lock底层实现，condition类的作用
 5、Redis怎么保持数据一致性
 6、Redis做分布式锁如果释放锁失败怎么办
 7、JVM内存模型
