@@ -295,9 +295,9 @@ ReadView  中是当前活跃的事务  ID  列表，称之为  m_ids ，其中�
 如果在  RR  隔离级别下，为什么事务  B  前后两次均查询到  10  呢？ RR  下生成  ReadView  是在事务开始时，m_ids 为 [200,300]，后面不发生变化，因此即使事务  A  提交了， trx_id  为  200  的记录依旧处于  m_ids  中，不能被访问，只能访问版本链中的记录  10 。
 
 ### 6.权限控制Cookie、Session、Token <br>
-**Cookie**：服务端发送到用户浏览器并由浏览器保存的一小块数据，它会在下次浏览器向同一服务端再次发起请求时携带过去。**Cookie是不可跨域的。**例如：某个cookie属于www.baidu.com，那么www.taobao.com无法使用，但 www.baidu.com/1 和 www.baidu.com/2 可以共享使用，靠的是domain(也就是www.baidu.com)。<br>
+**Cookie**：服务端发送到用户浏览器并由浏览器保存的一小块数据，它会在下次浏览器向同一服务端再次发起请求时携带过去。**Cookie是不可跨域的**。例如：某个cookie属于www.baidu.com，那么www.taobao.com无法使用，但 www.baidu.com/1 和 www.baidu.com/2 可以共享使用，靠的是domain(也就是www.baidu.com)。<br>
 **Session**：**基于Cookie实现**，session存储在服务端，sessionId会被存储在浏览器的cookie中。<br>
-session认证流程：1、浏览器第一次请求服务器，服务器根据用户提交的信息创建session，并将sessionId返回给浏览器。2、浏览器将收到的sessionId放在cookie中，同时cookie会记录此sessionId属于哪个域名。3、浏览器再次请求服务器时，会将对应域名下的cookie信息发送给服务器，服务器进行鉴权。
+session认证流程：1、浏览器第一次请求服务器，服务器根据用户提交的信息创建session，并将sessionId返回给浏览器。2、浏览器将收到的sessionId放在cookie中，同时cookie会记录此sessionId属于哪个域名。3、浏览器再次请求服务器时，会将对应域名下的cookie信息发送给服务器，服务器进行鉴权。<br>
 **Cookie和Session的区别**：1、Session比Cookie安全，因为Session存储在服务器，Cookie存储在浏览器。2、存储的值类型不同，Cookie只支持字符串数据，其他类型的数据需要转换成字符串，而Seesion可以存任意类型。3、有效期不同：Cookie可以设置长时间保持（例如常见的默认登陆功能），而Session的有效期较短，浏览器关闭或者Session超时都会失效。4、存储数据的大小不同：单个Cookie最多支持4K，而Session可存储的数据远大于Cookie，但当数据量过大和访问量过多，会占用服务器资源。
 
 
