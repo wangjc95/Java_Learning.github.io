@@ -308,6 +308,9 @@ Token特点：1、服务端无状态化，可拓展性好。服务端不存放to
 JWT是自包含的(内部包含了一些会话信息、用户信息)，减少了查询数据库的需要；JWT若不使用cookie，可以使用任何域名访问API服务而不需要担心跨域资源共享问题；因为用户的状态不保存在服务端，所以是无状态的认证机制。
 JWT认证过程：1、客户端浏览器使用用户名密码登录，服务端认证成功后，使用密钥创建JWT并返回给浏览器。2、浏览器通常将JWT保存在localStorage，也可以使用cookie(不能跨域)。3、当客户端访问受保护的资源时，在请求Header中的Authorization字段使用Bearer模式添加JWT(内容：Authorization : Bearer <token>)，使服务端可以解密检查。
 
+### 7.String、StringBuilder、StringBuffer
+**String**：Immutable的类(final class)、内部的属性也是Immutable的(final)，所以原生的保证了性能安全；但每次对String对象的裁剪、拼接等操作会产生新的对象。底层使用char数组实现。
+
 
 ## 五、面试记录
 ### 字节跳动直播中台
