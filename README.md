@@ -303,13 +303,14 @@ session认证流程：1、浏览器第一次请求服务器，服务器根据用
 Token认证流程：1、客户端使用用户名密码登录。2、服务端收到用户名密码，验证。若验证成功，服务端会签发一个token并返回。3、客户端收到token后，会把它存储在cookie或者localStorage中。4、以后每次请求，客户端都要携带token（放在HTTP的Header里），服务端都要进行验证。<br>
 Token特点：1、服务端无状态化，可拓展性好。服务端不存放token数据，用解析token的计算时间换取存储token的空间，从而减轻服务器压力。2、支持移动端设备。
 **Session和Token的区别**：1、**Session使服务端状态化**，可以记录服务端和客户端的会话状态；而**Token是令牌，使服务端无状态化**，不存储会话信息。
-2、类似于OAuth Token的Token机制，提供的是**认证**和**授权**，认证针对的是用户，授权针对的是App，目的是让某App有权利访问某用户的信息；而Session只提供简单的认证，即只要有SessionId便认为拥有此用户的全部权利，因此此数据需要保密，不能共享给其它网站或第三方App。**所以如果网站需要和第三方共享用户数据或提供API给第三方调用，用Token**。
+2、类似于OAuth Token的Token机制，提供的是**认证**和**授权**，认证针对的是用户，授权针对的是App，目的是让某App有权利访问某用户的信息；而Session只提供简单的认证，即只要有SessionId便认为拥有此用户的全部权利，因此此数据需要保密，不能共享给其它网站或第三方App。**所以如果网站需要和第三方共享用户数据或提供API给第三方调用，用Token**。<br>
 **JWT(JSON Web Token)**:目前最流行的跨域认证解决方案，是一种认证授权机制。使用HMAC或者RSA加密的公私秘钥对JWT签名，因此，这些传递的信息是安全可信的。
 JWT是自包含的(内部包含了一些会话信息、用户信息)，减少了查询数据库的需要；JWT若不使用cookie，可以使用任何域名访问API服务而不需要担心跨域资源共享问题；因为用户的状态不保存在服务端，所以是无状态的认证机制。
 JWT认证过程：1、客户端浏览器使用用户名密码登录，服务端认证成功后，使用密钥创建JWT并返回给浏览器。2、浏览器通常将JWT保存在localStorage，也可以使用cookie(不能跨域)。3、当客户端访问受保护的资源时，在请求Header中的Authorization字段使用Bearer模式添加JWT(内容：Authorization : Bearer <token>)，使服务端可以解密检查。
 
 ### 7.String、StringBuilder、StringBuffer
-**String**：Immutable的类(final class)、内部的属性也是Immutable的(final)，所以原生的保证了性能安全；但每次对String对象的裁剪、拼接等操作会产生新的对象。底层使用char数组实现。
+**String**：Immutable的类(final class)、内部的属性也是Immutable的(final)，所以原生的保证了性能安全；但每次对String对象的裁剪、拼接等操作会产生新的对象。底层使用char数组实现，在Java9中，底层修改为byte数组和编码标识符实现，相应的StringBuilder、StringBuffer、JVM Intrinsic机制(方法内联)都做了修改。<br>
+**StringBuffer**：线程安全的，通过在所有的方法上加synchronized关键字实现，因为加了锁，所以性能不如StringBuilder好。默认长度为16。<br>
 
 
 ## 五、面试记录
