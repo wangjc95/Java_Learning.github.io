@@ -141,8 +141,14 @@ Example：sf-agent-service          BaseCompanyAttributionReq
 
 ![Aaron Swartz](https://raw.githubusercontent.com/wangjc95/photos/master/image2020-4-8_17-49-23.png)
 
+## 四、《MySQL技术内幕-InnoDB存储引擎》
+### 第6章 锁
+InnoDB中锁的类型：1、共享锁(Share Lock、S锁)，允许事务读一行数据。2、排它锁(Exclusive Lock、X锁)，允许事务更新或删除一行数据。<br>
+//   X         S <br>
+X  不兼容     不兼容<br>
+S  不兼容      兼容<br>
 
-## 四、学习笔记
+## 五、学习笔记
 ### 1.Java引用类型：
 1.强引用：类似于 Object a = new Object() 这类的引用，**只要垃圾强引用存在，垃圾回收器就不会回收被引用的对象**。<br>
 2.软引用：对于软引用(使用SoftReference类实现软引用)关联的对象，**在JVM将要发生OOM(Out Of Memory)异常之前，会把这些对象列入第二次垃圾回收范围。如果本次回收还没有足够的内存，则抛出内存异常(当一个对象在堆上分配内存且不够时，先发生一次GC，清理掉弱引用和虚引用，如果够就分配，如果不够就进行第二次GC，清理掉软引用，如果清理完还不够，则抛出内存溢出异常。)**。<br>
