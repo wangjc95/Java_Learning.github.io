@@ -144,7 +144,7 @@ Example：sf-agent-service          BaseCompanyAttributionReq
 ## 四、《MySQL技术内幕-InnoDB存储引擎》
 ### 第6章 锁
 InnoDB中锁的类型：1、共享锁(Share Lock、S锁)，允许事务读一行数据。2、排它锁(Exclusive Lock、X锁)，允许事务更新或删除一行数据。<br>
-//   X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S <br>
+//   X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S <br>
 X  不兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不兼容<br>
 S  不兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;兼容<br>
 
