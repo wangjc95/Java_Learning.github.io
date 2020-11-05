@@ -147,7 +147,7 @@ InnoDB中锁的类型：1、共享锁(Share Lock、S锁)，允许事务读一行
 //   X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S <br>
 X  不兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不兼容<br>
 S  不兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;兼容<br>
-此外，InnoDB存储引擎支持多粒度(granular)锁定，允许事务在行级锁和表级锁上的锁同时存在。为了支持这种操作，InnoDB支持了一种额外的锁方式,称之为**意向锁**(Intension Lock)。意向锁又分为IS Lock和IX Lock。**若需要对细粒度的对象上锁，那么首先需要对粗粒度的对象上锁。**若需要对记录上X锁，则需要分别对数据库、表、页上意向锁IX，最后对记录上X锁。若其中任何一个部分等待，则该操作阻塞。<br>
+此外，InnoDB存储引擎支持多粒度(granular)锁定，允许事务在行级锁和表级锁上的锁同时存在。为了支持这种操作，InnoDB支持了一种额外的锁方式,称之为**意向锁**(Intension Lock)。意向锁又分为IS Lock和IX Lock。**若需要对细粒度的对象上锁，那么首先需要对粗粒度的对象上锁**。若需要对记录上X锁，则需要分别对数据库、表、页上意向锁IX，最后对记录上X锁。若其中任何一个部分等待，则该操作阻塞。<br>
 // IS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X <br>
 IS  兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不兼容<br>
 IX  兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不兼容<br>
