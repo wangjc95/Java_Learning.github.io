@@ -312,6 +312,12 @@ JWT认证过程：1、客户端浏览器使用用户名密码登录，服务端�
 **String**：Immutable的类(final class)、内部的属性也是Immutable的(final)，所以原生的保证了性能安全；但每次对String对象的裁剪、拼接等操作会产生新的对象。底层使用char数组实现，在Java9中，底层修改为byte数组和编码标识符实现，相应的StringBuilder、StringBuffer、JVM Intrinsic机制(方法内联)都做了修改。<br>
 **StringBuffer**：线程安全的，通过在所有的方法上加synchronized关键字实现，因为加了锁，所以性能不如StringBuilder好。默认长度为16。<br>
 
+### 8.Java代理机制与反射
+**反射**：赋予程序在运行时**自省**(introspect)的能力，通过反射可以直接操作类或者对象，比如获取某个对象的定义、获取类声明的属性和方法、调用方法或者构造对象、甚至在运行时修改类定义。例如AccessibleObject.setAccessible(boolean flag)方法就可以在运行时修改方法的访问权限。<br>
+**动态代理**：运行时构建代理、动态处理代理方法调用的机制。常用于RPC、AOP。<br>
+**实现动态代理的两种方式**：1、JDK自带的动态代理，利用了反射机制实现。2、ASM、cglib、Javassit等高性能的字节码操作机制。
+
+
 
 ## 五、面试记录
 ### 字节跳动直播中台
