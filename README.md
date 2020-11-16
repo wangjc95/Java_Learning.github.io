@@ -159,7 +159,7 @@ X  不兼容&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不兼容&nbsp;&nbsp;&nbsp
 2、Gap Lock：间隙锁，锁定一个范围，但不包括记录本身<br>
 3、Next Key Lock：等于 Record Lock + Gap Lock，锁定一个范围，并且包含记录本身<br>
 例如一个索引列有10、11、13、20四个值，那该索引可能被 Next Key Locking的区间为：(-∞, 10], (10, 11], (11, 13], (13, 20], (20, +∞)<br>
-**Next Key Lock的设计是为了解决 Phantom Problem(幻读)。**它是谓词锁(predict lock)的一种改进。除了Next Key Locking技术(左开右闭)，还有 Previous Key Locking技术(左闭右开)。<br>
+**设计Next Key Lock是为了解决 Phantom Problem(幻读)。**它是谓词锁(predict lock)的一种改进。除了Next Key Locking技术(左开右闭)，还有 Previous Key Locking技术(左闭右开)。<br>
 **当查询的索引含有唯一属性时，InnoDB引擎会对Next Key Lock进行优化，降级为Record Lock，从而提高应用的并发性。** 若查询的索引是辅助索引，则使用Next Key Lock。**需要特别注意的是，InnoDB引擎还会对辅助索引的下一个值加上Gap Lock。**<br>
 
 
