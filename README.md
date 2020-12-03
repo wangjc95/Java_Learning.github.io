@@ -338,6 +338,13 @@ JWT认证过程：1、客户端浏览器使用用户名密码登录，服务端�
 **动态代理**：运行时构建代理、动态处理代理方法调用的机制。常用于RPC、AOP。例如RPC中，通过代理可以实现调用者和提供者之间的**解耦**，RPC框架内部的寻址、序列化、反序列化等等对于调用者来说并不关心。<br>
 **实现动态代理的两种方式**：1、JDK自带的动态代理，利用了反射机制实现。通过实现InvocationHandler接口来实现。2、ASM、cglib、Javassit等高性能的字节码操作机制。cglib通过生成目标类的子类来实现(MethodInterceptor)，适用于目标类没有实现接口但还是希望被动态代理。<br>
 
+### 9.Redis
+Redis读取速度为11W次/s，写入速度为8W次/s。<br>
+**Redis支持的数据类型**：最常用的5种：String、Hash、List、Set、Sorted Set。其他：HyperLogLog、Geo等等。<br>
+**Redis比Memcached的优势？**：1、Memcached所有值均是简单字符串，而Redis支持丰富的数据类型。2、Redis速度比Memcached快很多。3、Redis可以持久化数据。<br>
+单个字符串可存储的最大容量为512M。<br>
+**Redis的持久化机制**：1、RDB(Redis DataBase)：在某个时间点记录所有键值对，生成临时的.rdb文件，生成完毕后替换原先的.rdb文件。触发机制：自动触发(一定时间内写操作次数，60s 1W次写入、300s 100次写入、 900s 1次写入)、手动触发(save(同步)、bgsave(异步，bgsave原理：fork + copyOnWrite))
+
 
 
 ## 五、面试记录
