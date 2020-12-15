@@ -343,7 +343,18 @@ Redis读取速度为11W次/s，写入速度为8W次/s。<br>
 **Redis支持的数据类型**：最常用的5种：String、Hash、List、Set、Sorted Set。其他：HyperLogLog、Geo等等。<br>
 **Redis比Memcached的优势？**：1、Memcached所有值均是简单字符串，而Redis支持丰富的数据类型。2、Redis速度比Memcached快很多。3、Redis可以持久化数据。<br>
 单个字符串可存储的最大容量为512M。<br>
-**Redis的持久化机制**：1、RDB(Redis DataBase)：在某个时间点记录所有键值对，生成临时的.rdb文件，生成完毕后替换原先的.rdb文件。触发机制：自动触发(一定时间内写操作次数，60s 1W次写入、300s 100次写入、 900s 1次写入)、手动触发(save(同步)、bgsave(异步，bgsave原理：fork + copyOnWrite))
+**Redis的持久化机制**：1、RDB(Redis DataBase)：在某个时间点记录所有键值对，生成临时的.rdb文件，生成完毕后替换原先的.rdb文件。触发机制：自动触发(一定时间内写操作次数，60s 1W次写入、300s 100次写入、 900s 1次写入)、手动触发(save(同步)、bgsave(异步，bgsave原理：fork + copyOnWrite)) <br>
+
+
+### 10.Java IO
+Java的IO机制是由BIO、NIO、AIO逐步演化来的。
+**BIO**：传统的java.io包，基于流实现，提供了比如文件流、输入输出流等。交互方式是同步、阻塞，所以被称为BIO(Blocking IO)。很多时候，java.net包下的部分网络API，比如Socket、ServerSocket也归到BIO中，因为网络通信同样是IO行为。<br>
+**NIO**：JDK 1.4中引入了 java.nio包，提供了**Channel**、**Buffer**、**Selector**等新的抽象，可以用来构建多路复用、同步非阻塞的IO程序。<br>
+**AIO**：JDK 1.7中，NIO有了进一步的改进，也就是NIO 2，引入了**异步非阻塞IO方式**,也被称为AIO(Asynchronous IO)。AIO操作基于事件和回调机制，可简单理解为：应用操作直接返回，不会阻塞在某处；当处理完成，操作系统会通知相应线程进行后续工作。<br>
+BIO响应请求：一个请求对应一个后台线程，当请求太多时，启动或销毁一个线程开销是很大的。<br>
+![Aaron Swartz](https://github.com/wangjc95/photos/blob/master/WechatIMG2488.jpeg)
+
+
 
 
 
