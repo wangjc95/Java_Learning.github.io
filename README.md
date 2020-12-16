@@ -347,12 +347,15 @@ Redis读取速度为11W次/s，写入速度为8W次/s。<br>
 
 
 ### 10.Java IO
-Java的IO机制是由BIO、NIO、AIO逐步演化来的。
+Java的IO机制是由BIO、NIO、AIO逐步演化来的。<br>
 **BIO**：传统的java.io包，基于流实现，提供了比如文件流、输入输出流等。交互方式是同步、阻塞，所以被称为BIO(Blocking IO)。很多时候，java.net包下的部分网络API，比如Socket、ServerSocket也归到BIO中，因为网络通信同样是IO行为。<br>
 **NIO**：JDK 1.4中引入了 java.nio包，提供了**Channel**、**Buffer**、**Selector**等新的抽象，可以用来构建多路复用、同步非阻塞的IO程序。<br>
 **AIO**：JDK 1.7中，NIO有了进一步的改进，也就是NIO 2，引入了**异步非阻塞IO方式**,也被称为AIO(Asynchronous IO)。AIO操作基于事件和回调机制，可简单理解为：应用操作直接返回，不会阻塞在某处；当处理完成，操作系统会通知相应线程进行后续工作。<br>
 BIO响应请求：一个请求对应一个后台线程，当请求太多时，启动或销毁一个线程开销是很大的。<br>
-![Aaron Swartz](https://github.com/wangjc95/photos/blob/master/WechatIMG2488.jpeg)
+![Aaron Swartz](https://github.com/wangjc95/photos/blob/master/WechatIMG2488.jpeg) <br>
+NIO响应请求：单线程轮询事件，仅select阶段是阻塞的。
+![Aaron Swartz](https://github.com/wangjc95/photos/blob/master/NIO.jpeg) <br>
+**选择NIO还是BIO要看具体场景**，并不是说NIO就一定好，比如，多人聊天，每次发送的数据都是很小的内容，就很适合NIO；但连接数很小、传输的数据很多的时候，适合用BIO。<br>
 
 
 
