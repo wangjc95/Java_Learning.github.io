@@ -204,6 +204,11 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *
 
 2、同步非阻塞IO：应用进程调用recvfrom()，如果数据没准备好，内核就会立即返回错误，应用进程可以继续执行，但需要不断的轮询调用recvfrom()来获取是否可以进行数据的复制。由于需要执行更多的系统调用，所以效率偏低。<br>
 
-3、同步多路复用IO：
+3、同步多路复用IO：先使用 select 或者 poll 等待数据准备好，当多个Socket中的某个变为可读状态时返回，这一过程是阻塞的；然后再调用recvfrom()复制数据到应用进程。它可以让单进程具备处理多个IO事件的能力。减少线程创建和销毁的开销。<br>
+
+4、同步信号驱动IO(SIG IO)：应用进程调用sigaction，若数据未准备好内核立即返回，应用进程可执行其他操作，也就是说在数据准备阶段是非阻塞的。当数据准备好时，内核向应用进程发出sigio信号，应用进程收到后进行recvfrom 复制数据。<br>
+
+5、异步IO(AIO)：应用进程在调用aio_read后，内核立即返回，并在将数据从内核复制到应用进程完成后向应用进程发送信号，通知应用进程IO完成。应用进程在整个过程中不会被阻塞。<br>
+![Aaron Swartz](https://github.com/wangjc95/photos/blob/master/Unix%20IO.png) <br>
 
 
