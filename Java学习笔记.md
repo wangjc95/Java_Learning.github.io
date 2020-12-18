@@ -192,3 +192,14 @@ NIO响应请求：单线程轮询事件，仅select阶段是阻塞的。
 ![Aaron Swartz](https://github.com/wangjc95/photos/blob/master/NIO.jpeg) <br>
 **选择NIO还是BIO要看具体场景**，并不是说NIO就一定好，比如，多人聊天，每次发送的数据都是很小的内容，就很适合NIO；但连接数很小、传输的数据很多的时候，适合用BIO。<br>
 
+### 11. Unix IO
+**一个输入操作通常包括两个阶段：1、等待数据准备好 2、从内核向应用进程复制数据**。在 同步IO 中，阶段2总是阻塞的；异步IO的两个阶段均不阻塞。 <br>
+**Unix IO 五大模型**:<br>
+1、同步阻塞IO：应用进程调用revcfrom()，然后被阻塞，直到数据被复制到应用进程的缓冲区才返回。应该注意到，只是应用进程被阻塞，并不是整个操作系统阻塞，因此不消耗CPU时间.<br>
+ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr, socklen_t *addrlen); <br>
+
+2、同步非阻塞IO：应用进程调用recvfrom()，如果数据没准备好，内核就会立即返回错误，应用进程可以继续执行，但需要不断的轮询调用recvfrom()来获取是否可以进行数据的复制。由于需要执行更多的系统调用，所以效率偏低。<br>
+
+3、同步多路复用IO：
+
+
