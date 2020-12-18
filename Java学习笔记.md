@@ -4,7 +4,8 @@
 3.弱引用：比软引用更弱，被弱引用(使用WeakReference类实现弱引用)关联的对象只能存活到下次垃圾回收之前。当发生GC时(Garbage Collection)时，**无论当前内存是否足够，都会清理掉只被弱引用关联的对象**。<br>
 4.虚引用：一个对象是否有虚引用(使用PhantomReference类实现虚引用)的存在，完全不会对其生存时间构成影响，也无法通过虚引用取得一个对象的实例。**为一个对象设置虚引用关联的唯一目的就是能够在这个对象被垃圾回收器回收掉后收到一个通知**。
 弱引用使用场景：假设有这样一个需求，每次创建一个数据库Connection时，需要将用户信息User与Connection关联。典型的做法就是在一个全局的Map中存储Connection与User的映射。<br>
-public class ConnManager {<br>
+```
+public class ConnManager {
     private Map<Connection,User> m = new HashMap<Connection,User>();
 
     public void setUser(Connection s, User u) {
@@ -16,7 +17,8 @@ public class ConnManager {<br>
     public void removeUser(Connection s) {
         m.remove(s);
     }
-}<br>
+}
+```
 这样做的问题是User生命周期与Connection挂钩，我们无法准确预知Connection在什么时候结束，所以需要在每个Connection关闭之后，手动从Map中移除键值对，否则Connection和User将一直被Map引用，即使Connection的生命周期已经结束了，GC也无法回收对应的Connection和User。这些对象留在内存中不受控制，可能会造成内存溢出。<br>
 **解决方法**：private Map<Connection,User> m = new WeakHashMap<Connection,User>();<br>
 WeakHashMap 与 HashMap类似，但是在其内部，key是经过WeakReference包装的。使用WeakHashMap情况会变得怎样呢？
@@ -196,7 +198,9 @@ NIO响应请求：单线程轮询事件，仅select阶段是阻塞的。
 **一个输入操作通常包括两个阶段：1、等待数据准备好 2、从内核向应用进程复制数据**。在 同步IO 中，阶段2总是阻塞的；异步IO的两个阶段均不阻塞。 <br>
 **Unix IO 五大模型**:<br>
 1、同步阻塞IO：应用进程调用revcfrom()，然后被阻塞，直到数据被复制到应用进程的缓冲区才返回。应该注意到，只是应用进程被阻塞，并不是整个操作系统阻塞，因此不消耗CPU时间.<br>
+```
 ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr, socklen_t *addrlen); <br>
+```
 
 2、同步非阻塞IO：应用进程调用recvfrom()，如果数据没准备好，内核就会立即返回错误，应用进程可以继续执行，但需要不断的轮询调用recvfrom()来获取是否可以进行数据的复制。由于需要执行更多的系统调用，所以效率偏低。<br>
 
