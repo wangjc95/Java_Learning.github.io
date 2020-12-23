@@ -180,7 +180,9 @@ Redis读取速度为11W次/s，写入速度为8W次/s。<br>
 **Redis比Memcached的优势？**：1、Memcached所有值均是简单字符串，而Redis支持丰富的数据类型。2、Redis速度比Memcached快很多。3、Redis可以持久化数据。<br>
 单个字符串可存储的最大容量为512M。<br>
 **Redis的持久化机制**：1、RDB(Redis DataBase)：在某个时间点记录所有键值对，生成临时的.rdb文件，生成完毕后替换原先的.rdb文件。触发机制：自动触发(一定时间内写操作次数，60s 1W次写入、300s 100次写入、 900s 1次写入)、手动触发(save(同步)、bgsave(异步，bgsave原理：fork + copyOnWrite)) <br>
-
+2、AOF(Append Only File)：所有Redis命令记录以Redis命令请求协议的格式完全存储在aof文件中。更新模式(appendfsync)有三种：always、everysec、no。<br>
+**RDB和AOF比较**：1、RDB适合大规模数据快速恢复，但数据完整性不如AOF好。但AOF文件比RDB文件大，恢复效率不如RDB高。2、若只使用Redis做缓存，可关闭AOF。3、若使用了Redis的持久化，建议RDB和AOF都开启。<br>
+**Redis键的淘汰策略**：6种：volatile-ttl、volatile-lru、volatile-random、allkeys-lru、allkeys-random、noeviction
 
 ### 10.Java IO
 **字节流和字符流的区别**：1、字节流读取单个字节，字符流读取单个字符（一个字符根据编码的不同，对应的字节也不同，比如UTF-8编码是3个字节，中文编码是2个字节）。2、字节流用来处理二进制文件(图片、MP3、视频等)，字符流用来处理文本文件（可以看做是使用了某种编码的二进制文件，人可以阅读）。**简而言之，字节是给计算机看的，字符是给人看的**。<br>
