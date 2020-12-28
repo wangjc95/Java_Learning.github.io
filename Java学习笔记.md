@@ -213,4 +213,9 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *
 5、异步IO(AIO)：应用进程在调用aio_read后，内核立即返回，并在将数据从内核复制到应用进程完成后向应用进程发送信号，通知应用进程IO完成。应用进程在整个过程中不会被阻塞。<br>
 ![Unix IO](https://github.com/wangjc95/photos/blob/master/Unix%20IO.png?raw=true) <br>
 
-
+**多路复用IO之select、poll、epoll**<br>
+1、select
+```
+int select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+```
+select监视的文件描述符分三类：readfds、writefds、exceptfds。
