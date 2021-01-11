@@ -6,3 +6,6 @@
 ### 2、对象头的结构
 对象头分为两部分：Mark Word、Class Pointer。Class Pointer就是类型指针，指向该对象所属的类在方法区中的类信息。Mark Word结构见下图<br>
 ![Mark Word](https://github.com/wangjc95/photos/blob/master/Mark%20Word.png?raw=true) <br>
+
+### 3、synchronized
+被synchronized关键字修饰的代码被编译后会被 monitor enter 和 monitor exit两条字节码指令包围。monitor依赖于操作系统的mutex lock实现。
